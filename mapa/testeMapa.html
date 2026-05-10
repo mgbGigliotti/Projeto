@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>Teste MiniMapa</title>
+
+<style>
+
+body{
+    margin:0;
+    overflow:hidden;
+    background:black;
+}
+
+canvas{
+    display:block;
+    margin:auto;
+    background:black;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="canvas" width="1280" height="720"></canvas>
+
+<script>
+
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+
+
+// =======================================
+// CRIA MINI MAPA
+// =======================================
+
+function criarMiniMapa(ctx, canvas){
+
+    let mapaAberto = false;
+    let faseSelecionada = 0;
+
+    // posições das fases
+    const fases = [
+        { x: 240, y: 380 },
+        { x: 610, y: 380 },
+        { x: 980, y: 380 }
+    ];
+
+    // posição atual
+    let quadradoX = fases[0].x;
+    let quadradoY = fases[0].y;
+
+    // destino
+    let destinoX = fases[0].x;
+    let destinoY = fases[0].y;
+
+    // menor = mais suave
+    const velocidadeMapa = 0.08;
+
+    let movendoNoMapa = false;
+
+    // imagem do mapa
+    const imagemMapa = new Image();
+    imagemMapa.src = "mapaImagem.jpg";
+
+
+    // =======================================
+    // CONTROLES
+    // =======================================
+
+    document.addEventListener("keydown", (e) => {
+
+        if(!mapaAberto) return;
+        if(movendoNoMapa) return;
+
+        // esquerda
+        if((e.key === "a" || e.key === "A") && faseSelecionada > 0){
+
+            faseSelecionada--;
+
+            destinoX = fases[faseSelecionada].x;
+            destinoY = fases[faseSelecionada].y;
+
+            movendoNoMapa = true;
+        }
+
+        // direita
+        if((e.key === "d" || e.key === "D") && faseSelecionada < 2){
+
+            faseSelecionada++;
+
+            destinoX = fases[faseSelecionada].x;
+            destinoY = fases[faseSelecionada].y;
+
+            movendoNoMapa = true;
+        }
+
+        // entrar na fase
+        if(e.key === "Enter"){
+
+            iniciarFase(faseSelecionada + 1);
+        }
+
+    });
+
+
+    // =======================================
+    // UPDATE
+    // =======================================
+
+    function updateMapa(){
+
+        // movimento suave
+        quadradoX += (destinoX - quadradoX) * velocidadeMapa;
+        quadradoY += (destinoY - quadradoY) * velocidadeMapa;
+
+        // verifica distância
+        if(
+            Math.abs(quadradoX - destinoX) < 1 &&
+            Math.abs(quadradoY - destinoY) < 1
+        ){
+            quadradoX = destinoX;
+            quadradoY = destinoY;
+
+            movendoNoMapa = false;
+        }
+    }
+
+
+    // =======================================
+    // DRAW
+    // =======================================
+
+    function desenharMapa(){
+
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+
+        ctx.drawImage(
+            imagemMapa,
+            0,
+            0,
+            canvas.width,
+            canvas.height
+        );
+
+        // quadrado
+        ctx.fillStyle = "red";
+
+        ctx.fillRect(
+            quadradoX,
+            quadradoY,
+            40,
+            40
+        );
+
+        // texto
+        ctx.fillStyle = "white";
+        ctx.font = "28px Arial";
+
+        ctx.fillText(
+            "A/D = mover | ENTER = selecionar fase",
+            300,
+            660
+        );
+    }
+
+
+    // =======================================
+    // LOOP
+    // =======================================
+
+    function loopMapa(){
+
+        if(!mapaAberto) return;
+
+        updateMapa();
+        desenharMapa();
+
+        requestAnimationFrame(loopMapa);
+    }
+
+
+    // =======================================
+    // FUNÇÕES
+    // =======================================
+
+    function abrirMapa(){
+
+        mapaAberto = true;
+
+        loopMapa();
+    }
+
+    function fecharMapa(){
+
+        mapaAberto = false;
+    }
+
+    function iniciarFase(numeroDaFase){
+
+        alert("Entrando na fase " + numeroDaFase);
+
+        fecharMapa();
+    }
+
+    return {
+        abrirMapa,
+        fecharMapa,
+        iniciarFase
+    };
+
+}
+
+
+// =======================================
+// INICIAR TESTE
+// =======================================
+
+const miniMapa = criarMiniMapa(ctx, canvas);
+
+// abre automaticamente
+miniMapa.abrirMapa();
+
+</script>
+
+</body>
+</html>
