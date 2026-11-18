@@ -4,7 +4,7 @@
 
 #include "funcoes.h"
 
-// Funcao principal do programa.
+// funcao principal do programa
 int main(void) {
     struct Investidor usuario;
     double cotacoes[3];
@@ -13,10 +13,10 @@ int main(void) {
     int opcao;
     int logado = 0;
 
-    // Inicializa os numeros aleatorios.
+    // inicializa os numeros aleatorios
     srand((unsigned int)time(NULL));
 
-    // Carrega os precos das criptomoedas.
+    // carrega os precos das criptomoedas
     carregarCotacoes(cotacoes);
 
     do {
@@ -49,7 +49,7 @@ int main(void) {
                 printf("\nOpcao invalida!\n");
         }
 
-        // Menu principal do investidor logado.
+        // menu principal do investidor logado
         if (logado) {
             do {
                 mostrarMenu();
